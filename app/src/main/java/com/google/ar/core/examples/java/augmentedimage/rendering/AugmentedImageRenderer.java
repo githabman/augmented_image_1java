@@ -89,7 +89,7 @@ public class AugmentedImageRenderer {
           -0.5f * augmentedImage.getExtentZ()), // upper left
       Pose.makeTranslation(
           0.5f * augmentedImage.getExtentX(),
-          0.0f,
+          0.02f,
           -0.5f * augmentedImage.getExtentZ()), // upper right
       Pose.makeTranslation(
           0.5f * augmentedImage.getExtentX(),
