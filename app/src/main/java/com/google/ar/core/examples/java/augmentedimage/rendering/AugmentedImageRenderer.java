@@ -15,6 +15,8 @@
 package com.google.ar.core.examples.java.augmentedimage.rendering;
 
 import android.content.Context;
+import android.widget.Toast;
+
 import com.google.ar.core.Anchor;
 import com.google.ar.core.AugmentedImage;
 import com.google.ar.core.Pose;
@@ -32,10 +34,11 @@ public class AugmentedImageRenderer {
     0x009688, 0x4CAF50, 0x8BC34A, 0xCDDC39, 0xFFEB3B, 0xFFC107, 0xFF9800,
   };
 
+  private boolean showPaper = false;
+
   private final ObjectRenderer imageFrameUpperLeft = new ObjectRenderer();
-  private final ObjectRenderer imageFrameUpperRight = new ObjectRenderer();
-  private final ObjectRenderer imageFrameLowerLeft = new ObjectRenderer();
-  private final ObjectRenderer imageFrameLowerRight = new ObjectRenderer();
+
+  private final ObjectRenderer paper = new ObjectRenderer();
 
   public AugmentedImageRenderer() {}
 
@@ -43,8 +46,12 @@ public class AugmentedImageRenderer {
 
     imageFrameUpperLeft.createOnGlThread(
         context, "models/Test3.obj", "models/wood.png");
-    imageFrameUpperLeft.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
-    imageFrameUpperLeft.setBlendMode(BlendMode.SourceAlpha);
+//    imageFrameUpperLeft.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
+//    imageFrameUpperLeft.setBlendMode(BlendMode.SourceAlpha);
+
+    paper.createOnGlThread(context, "models/PaperTest1.obj", "models/basketball.jpg");
+
+
 
    /* imageFrameUpperRight.createOnGlThread(
         context, "models/frame_upper_right.obj", "models/frame_base.png");
@@ -60,6 +67,10 @@ public class AugmentedImageRenderer {
         context, "models/frame_lower_right.obj", "models/frame_base.png");
     imageFrameLowerRight.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
     imageFrameLowerRight.setBlendMode(BlendMode.SourceAlpha); */
+  }
+
+  public void drawPaper() {
+    showPaper = !showPaper;
   }
 
   public void draw(
@@ -103,17 +114,22 @@ public class AugmentedImageRenderer {
     imageFrameUpperLeft.updateModelMatrix(modelMatrix, scaleFactor);
     imageFrameUpperLeft.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
 
-    worldBoundaryPoses[1].toMatrix(modelMatrix, 0);
-    imageFrameUpperRight.updateModelMatrix(modelMatrix, scaleFactor);
-    imageFrameUpperRight.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
-
-    worldBoundaryPoses[2].toMatrix(modelMatrix, 0);
-    imageFrameLowerRight.updateModelMatrix(modelMatrix, scaleFactor);
-    imageFrameLowerRight.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
-
-    worldBoundaryPoses[3].toMatrix(modelMatrix, 0);
-    imageFrameLowerLeft.updateModelMatrix(modelMatrix, scaleFactor);
-    imageFrameLowerLeft.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
+    if (showPaper) {
+      worldBoundaryPoses[1].toMatrix(modelMatrix, 0);
+      paper.updateModelMatrix(modelMatrix, 0.05f);
+      paper.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
+    }
+//    worldBoundaryPoses[1].toMatrix(modelMatrix, 0);
+//    imageFrameUpperRight.updateModelMatrix(modelMatrix, scaleFactor);
+//    imageFrameUpperRight.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
+//
+//    worldBoundaryPoses[2].toMatrix(modelMatrix, 0);
+//    imageFrameLowerRight.updateModelMatrix(modelMatrix, scaleFactor);
+//    imageFrameLowerRight.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
+//
+//    worldBoundaryPoses[3].toMatrix(modelMatrix, 0);
+//    imageFrameLowerLeft.updateModelMatrix(modelMatrix, scaleFactor);
+//    imageFrameLowerLeft.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
   }
 
   private static float[] convertHexToColor(int colorHex) {

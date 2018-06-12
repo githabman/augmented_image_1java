@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -224,6 +225,12 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     } catch (IOException e) {
       Log.e(TAG, "Failed to read an asset file", e);
     }
+  }
+
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    augmentedImageRenderer.drawPaper();
+    return super.onTouchEvent(event);
   }
 
   @Override
