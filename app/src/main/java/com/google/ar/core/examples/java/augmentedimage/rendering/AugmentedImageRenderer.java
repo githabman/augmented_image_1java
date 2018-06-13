@@ -15,6 +15,8 @@
 package com.google.ar.core.examples.java.augmentedimage.rendering;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.SurfaceTexture;
 import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
@@ -36,41 +38,36 @@ public class AugmentedImageRenderer {
 
   private boolean showPaper = false;
 
-  private final ObjectRenderer imageFrameUpperLeft = new ObjectRenderer();
+  private final ObjectRenderer corkboardObj = new ObjectRenderer();
 
   private final ObjectRenderer paper = new ObjectRenderer();
 
   public AugmentedImageRenderer() {}
 
+
   public void createOnGlThread(Context context) throws IOException {
 
-    imageFrameUpperLeft.createOnGlThread(
-        context, "models/Test3.obj", "models/wood.png");
+    corkboardObj.createOnGlThread(
+        context, "models/Test3.obj", "//storage/emulated/0/DCIM/Camera/IMG_20180612_214840.jpg");
 //    imageFrameUpperLeft.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
-//    imageFrameUpperLeft.setBlendMode(BlendMode.SourceAlpha);
-
-    paper.createOnGlThread(context, "models/PaperTest1.obj", "models/basketball.jpg");
+    corkboardObj.setBlendMode(BlendMode.SourceAlpha);
 
 
 
-   /* imageFrameUpperRight.createOnGlThread(
-        context, "models/frame_upper_right.obj", "models/frame_base.png");
-    imageFrameUpperRight.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
-    imageFrameUpperRight.setBlendMode(BlendMode.SourceAlpha);
 
-    imageFrameLowerLeft.createOnGlThread(
-        context, "models/frame_lower_left.obj", "models/frame_base.png");
-    imageFrameLowerLeft.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
-    imageFrameLowerLeft.setBlendMode(BlendMode.SourceAlpha);
-
-    imageFrameLowerRight.createOnGlThread(
-        context, "models/frame_lower_right.obj", "models/frame_base.png");
-    imageFrameLowerRight.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
-    imageFrameLowerRight.setBlendMode(BlendMode.SourceAlpha); */
   }
 
-  public void drawPaper() {
-    showPaper = !showPaper;
+  public void saveChoice(){      }
+
+
+  public void drawPaper(Context context, String imagePath) {
+
+    try {
+      paper.createOnGlThread(context, "models/PaperTest1.obj", imagePath);
+      showPaper = true;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public void draw(
@@ -111,25 +108,15 @@ public class AugmentedImageRenderer {
     float[] modelMatrix = new float[16];
 
     worldBoundaryPoses[0].toMatrix(modelMatrix, 0);
-    imageFrameUpperLeft.updateModelMatrix(modelMatrix, scaleFactor);
-    imageFrameUpperLeft.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
+    corkboardObj.updateModelMatrix(modelMatrix, scaleFactor);
+    corkboardObj.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
 
     if (showPaper) {
       worldBoundaryPoses[1].toMatrix(modelMatrix, 0);
       paper.updateModelMatrix(modelMatrix, 0.05f);
       paper.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
     }
-//    worldBoundaryPoses[1].toMatrix(modelMatrix, 0);
-//    imageFrameUpperRight.updateModelMatrix(modelMatrix, scaleFactor);
-//    imageFrameUpperRight.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
-//
-//    worldBoundaryPoses[2].toMatrix(modelMatrix, 0);
-//    imageFrameLowerRight.updateModelMatrix(modelMatrix, scaleFactor);
-//    imageFrameLowerRight.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
-//
-//    worldBoundaryPoses[3].toMatrix(modelMatrix, 0);
-//    imageFrameLowerLeft.updateModelMatrix(modelMatrix, scaleFactor);
-//    imageFrameLowerLeft.draw(viewMatrix, projectionMatrix, colorCorrectionRgba, tintColor);
+
   }
 
   private static float[] convertHexToColor(int colorHex) {

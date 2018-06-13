@@ -16,12 +16,19 @@
 
 package com.google.ar.core.examples.java.augmentedimage;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
@@ -41,6 +48,7 @@ import com.google.ar.core.Frame;
 import com.google.ar.core.Session;
 import com.google.ar.core.TrackingState;
 import com.google.ar.core.examples.java.augmentedimage.rendering.AugmentedImageRenderer;
+import com.google.ar.core.examples.java.augmentedimage.rendering.ObjectRenderer;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
 import com.google.ar.core.examples.java.common.helpers.DisplayRotationHelper;
 import com.google.ar.core.examples.java.common.helpers.FullScreenHelper;
@@ -51,8 +59,13 @@ import com.google.ar.core.exceptions.UnavailableApkTooOldException;
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException;
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,6 +91,10 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   private final AugmentedImageRenderer augmentedImageRenderer = new AugmentedImageRenderer();
 
   private boolean shouldConfigureSession = false;
+
+  //variables for choosing from gallery
+  private static final String IMAGE_DIRECTORY = "/DEMOUNTS";
+  private int GALLERY = 1, CAMERA = 2;
 
   // Augmented image configuration and rendering.
   // Load a single image (true) or a pre-generated image database (false).
@@ -229,15 +246,130 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    augmentedImageRenderer.drawPaper();
+    //augmentedImageRenderer.drawPaper();
+    AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
+    pictureDialog.setTitle("Select Action:");
+    String[] pictureDialogItems = {
+            "Select photo from gallery",
+            "Capture photo from camera" };
+
+    pictureDialog.setItems(pictureDialogItems, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        switch (which){
+          case 0:
+            choosePhotoFromGallary();
+            break;
+          case 1:
+            takePhotoFromCamera();
+            break;
+        }
+      }
+    });
+    pictureDialog.show();
     return super.onTouchEvent(event);
   }
+
+
+  //a function to allow pics be placed on posters
+  public void choosePhotoFromGallary(){
+    Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+    startActivityForResult(galleryIntent, GALLERY);
+  }
+
+  private void takePhotoFromCamera() {
+    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+    startActivityForResult(cameraIntent, CAMERA);
+  }
+
 
   @Override
   public void onSurfaceChanged(GL10 gl, int width, int height) {
     displayRotationHelper.onSurfaceChanged(width, height);
     GLES20.glViewport(0, 0, width, height);
   }
+
+  public String getPath( Uri uri ) {
+    String result = null;
+    String[] proj = { MediaStore.Images.Media.DATA };
+    Cursor cursor = getApplicationContext().getContentResolver( ).query( uri, proj, null, null, null );
+    if(cursor != null){
+      if ( cursor.moveToFirst( ) ) {
+        int column_index = cursor.getColumnIndexOrThrow( proj[0] );
+        result = cursor.getString( column_index );
+      }
+      cursor.close( );
+    }
+    if(result == null) {
+      result = "Not found";
+    }
+    return result;
+  }
+
+//activity result for receiveing data
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+
+
+    if (resultCode == this.RESULT_CANCELED) {
+      return;
+    }
+    if (requestCode == GALLERY) {
+
+      if (data != null) {
+        Uri contentURI = data.getData();
+        String picturePath = getPath(contentURI);
+        try {
+
+          Log.v("potato", "image path is " + picturePath);
+
+          augmentedImageRenderer.drawPaper(this, picturePath);
+
+        } catch (Exception e) {
+          e.printStackTrace();
+
+        }
+      }
+    } else if (requestCode == CAMERA) {
+      Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+      saveImage(thumbnail);
+      //Toast.makeText(MainActivity.this, "Image Saved!", Toast.LENGTH_SHORT).show();
+
+    }
+  }
+
+      public String saveImage(Bitmap myBitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+       myBitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+        File wallpaperDirectory = new File(
+            Environment.getExternalStorageDirectory() + IMAGE_DIRECTORY);
+    // have the object build the directory structure, if needed.
+        if (!wallpaperDirectory.exists()) {
+      wallpaperDirectory.mkdirs();
+    }
+
+       try {
+          File f = new File(wallpaperDirectory, Calendar.getInstance()
+              .getTimeInMillis() + ".jpg");
+          f.createNewFile();
+           FileOutputStream fo = new FileOutputStream(f);
+          fo.write(bytes.toByteArray());
+          MediaScannerConnection.scanFile(this,
+              new String[]{f.getPath()},
+              new String[]{"image/jpeg"}, null);
+          fo.close();
+          Log.d("TAG", "File Saved::--->" + f.getAbsolutePath());
+
+          return f.getAbsolutePath();
+        }      catch (IOException e1) {
+          e1.printStackTrace();
+          }
+    return "";
+     }
+
 
   @Override
   public void onDrawFrame(GL10 gl) {
