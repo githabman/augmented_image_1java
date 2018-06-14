@@ -17,6 +17,7 @@ package com.google.ar.core.examples.java.augmentedimage.rendering;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
@@ -116,16 +117,21 @@ public class ObjectRenderer {
    * @param objAssetName Name of the OBJ file containing the model geometry.
    * @param diffuseTextureAssetName Name of the PNG file containing the diffuse texture map.
    */
-  public void createOnGlThread(Context context, String objAssetName, String diffuseTextureAssetName)
+
+  //------------------------changes made here------------------------------------------
+  //-----------------------------------------------------------------------------------
+  public void createOnGlThread(Context context, String objAssetName, String diffuseTextureAssetName)//------------------------------------------------------
       throws IOException {
     // Read the texture.
+    //This is why causing code to crush
+    //-------------------need to modify this code-----------------------------
     Bitmap textureBitmap =
-        BitmapFactory.decodeStream(context.getAssets().open(diffuseTextureAssetName));
+       // BitmapFactory.decodeStream(context.getAssets().open(diffuseTextureAssetName));
+            BitmapFactory.decodeStream(context.getContentResolver().openInputStream(Uri.parse(diffuseTextureAssetName)));
 
     GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
     GLES20.glGenTextures(textures.length, textures, 0);
     GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
-
     GLES20.glTexParameteri(
         GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);
     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);

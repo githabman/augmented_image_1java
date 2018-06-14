@@ -100,7 +100,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   // Load a single image (true) or a pre-generated image database (false).
   private final boolean useSingleImage = false;
   // Augmented image and its associated center pose anchor, keyed by index of the augmented image in
-  // the
+  // the-------------------------------------------------------------------------------------
   // database.
   private final Map<Integer, Pair<AugmentedImage, Anchor>> augmentedImageMap = new HashMap<>();
 

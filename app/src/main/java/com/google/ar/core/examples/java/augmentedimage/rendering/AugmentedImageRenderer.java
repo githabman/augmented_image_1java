@@ -17,6 +17,7 @@ package com.google.ar.core.examples.java.augmentedimage.rendering;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
+import android.net.Uri;
 import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
@@ -48,10 +49,9 @@ public class AugmentedImageRenderer {
   public void createOnGlThread(Context context) throws IOException {
 
     corkboardObj.createOnGlThread(
-        context, "models/Test3.obj", "models/wood.png");
+        context, "models/Test3.obj", "file:///android_asset/fit_to_scan.png");
 //    imageFrameUpperLeft.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
     corkboardObj.setBlendMode(BlendMode.SourceAlpha);
-
 
 
 
@@ -124,4 +124,13 @@ public class AugmentedImageRenderer {
     float blue = (colorHex & 0x0000FF) / 255.0f * TINT_INTENSITY;
     return new float[] {red, green, blue, TINT_ALPHA};
   }
+  public void removeFromGlThread(Context context) throws IOException {
+
+    // remove the poster from the GlThread.
+
+
+  }
+
+
+
 }
