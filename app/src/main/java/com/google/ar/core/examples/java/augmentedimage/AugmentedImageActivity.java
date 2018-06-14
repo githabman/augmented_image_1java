@@ -494,28 +494,19 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     // Option 2) has
     // * shorter setup time
     // * doesn't require images to be packaged in apk.
-    if (useSingleImage) {
+
       Bitmap augmentedImageBitmap = loadAugmentedImageBitmap();
       if (augmentedImageBitmap == null) {
         return false;
       }
 
       augmentedImageDatabase = new AugmentedImageDatabase(session);
-      augmentedImageDatabase.addImage("image_name", augmentedImageBitmap);
+      augmentedImageDatabase.addImage("QR", augmentedImageBitmap);
       // If the physical size of the image is known, you can instead use:
       //     augmentedImageDatabase.addImage("image_name", augmentedImageBitmap, widthInMeters);
       // This will improve the initial detection speed. ARCore will still actively estimate the
       // physical size of the image as it is viewed from multiple viewpoints.
-    } else {
-      // This is an alternative way to initialize an AugmentedImageDatabase instance,
-      // load a pre-existing augmented image database.
-      try (InputStream is = getAssets().open("sample_database.imgdb")) {
-        augmentedImageDatabase = AugmentedImageDatabase.deserialize(session, is);
-      } catch (IOException e) {
-        Log.e(TAG, "IO exception loading augmented image database.", e);
-        return false;
-      }
-    }
+
 
     config.setAugmentedImageDatabase(augmentedImageDatabase);
     return true;

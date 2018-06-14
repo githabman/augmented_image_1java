@@ -48,7 +48,7 @@ public class AugmentedImageRenderer {
   public void createOnGlThread(Context context) throws IOException {
 
     corkboardObj.createOnGlThread(
-        context, "models/Test3.obj", "//storage/emulated/0/DCIM/Camera/IMG_20180612_214840.jpg");
+        context, "models/Test3.obj", "models/wood.png");
 //    imageFrameUpperLeft.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
     corkboardObj.setBlendMode(BlendMode.SourceAlpha);
 
@@ -56,8 +56,6 @@ public class AugmentedImageRenderer {
 
 
   }
-
-  public void saveChoice(){      }
 
 
   public void drawPaper(Context context, String imagePath) {
