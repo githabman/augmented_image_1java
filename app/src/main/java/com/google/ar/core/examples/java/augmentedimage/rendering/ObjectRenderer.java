@@ -21,11 +21,16 @@ import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+import android.util.Log;
+
 import com.google.ar.core.examples.java.common.rendering.ShaderUtil;
 import de.javagl.obj.Obj;
 import de.javagl.obj.ObjData;
 import de.javagl.obj.ObjReader;
 import de.javagl.obj.ObjUtils;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -120,14 +125,15 @@ public class ObjectRenderer {
 
   //------------------------changes made here------------------------------------------
   //-----------------------------------------------------------------------------------
-  public void createOnGlThread(Context context, String objAssetName, String diffuseTextureAssetName)//------------------------------------------------------
+  public void createOnGlThread(Context context, String objAssetName,String diffuseTextureAssetName )//------------------------------------------------------
       throws IOException {
     // Read the texture.
     //This is why causing code to crush
     //-------------------need to modify this code-----------------------------
+
     Bitmap textureBitmap =
-       // BitmapFactory.decodeStream(context.getAssets().open(diffuseTextureAssetName));
-            BitmapFactory.decodeStream(context.getContentResolver().openInputStream(Uri.parse(diffuseTextureAssetName)));
+       // BitmapFactory.decodeStream(new FileInputStream(file));
+            BitmapFactory.decodeStream(context.getAssets().open(diffuseTextureAssetName));
 
     GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
     GLES20.glGenTextures(textures.length, textures, 0);

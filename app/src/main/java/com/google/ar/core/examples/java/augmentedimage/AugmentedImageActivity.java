@@ -62,6 +62,7 @@ import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationExceptio
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -291,6 +292,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     GLES20.glViewport(0, 0, width, height);
   }
 
+
   public String getPath( Uri uri ) {
     String result = null;
     String[] proj = { MediaStore.Images.Media.DATA };
@@ -308,6 +310,12 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
     return result;
   }
 
+  public InputStream getInputStream(Uri uri){
+    File f1= new File(getPath(uri));
+    FileInputStream fs1= new FileInputStream(f1);
+    return fs1;
+
+  }
 //activity result for receiveing data
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -322,11 +330,12 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       if (data != null) {
         Uri contentURI = data.getData();
         String picturePath = getPath(contentURI);
+        InputStream picturestream = getInputStream(contentURI);
         try {
 
-          Log.v("potato", "image path is " + picturePath);
+          Log.v("potato", "image path is: " + picturePath);
 
-          augmentedImageRenderer.drawPaper(this, picturePath);
+          augmentedImageRenderer.drawPaper(this, picturestream);
 
         } catch (Exception e) {
           e.printStackTrace();

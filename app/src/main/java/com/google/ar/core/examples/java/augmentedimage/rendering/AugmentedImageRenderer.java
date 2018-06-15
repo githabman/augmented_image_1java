@@ -18,13 +18,17 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.AugmentedImage;
 import com.google.ar.core.Pose;
 import com.google.ar.core.examples.java.augmentedimage.rendering.ObjectRenderer.BlendMode;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 /** Renders an augmented image. */
 public class AugmentedImageRenderer {
@@ -48,9 +52,11 @@ public class AugmentedImageRenderer {
 
   public void createOnGlThread(Context context) throws IOException {
 
+   // InputStream objInputStream = context.getAssets().open("file");
     corkboardObj.createOnGlThread(
-        context, "models/Test3.obj", "file:///android_asset/fit_to_scan.png");
-//    imageFrameUpperLeft.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
+        context, "models/Test3.obj", "models/wood.png");
+       // Log.v("",""+);
+    corkboardObj.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
     corkboardObj.setBlendMode(BlendMode.SourceAlpha);
 
 
@@ -58,10 +64,10 @@ public class AugmentedImageRenderer {
   }
 
 
-  public void drawPaper(Context context, String imagePath) {
+  public void drawPaper(Context context, InputStream picturestream) {
 
     try {
-      paper.createOnGlThread(context, "models/PaperTest1.obj", imagePath);
+      paper.createOnGlThread(context, "models/PaperTest1.obj", picturestream.);
       showPaper = true;
     } catch (IOException e) {
       e.printStackTrace();
